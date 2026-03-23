@@ -1,0 +1,70 @@
+/* Ultra-Simple Registration Form Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f0ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: #ffffff;
+    width: 320px;
+    padding: 30px;
+    border: 2px solid #9b5de5; /* Light Purple Border */
+    border-radius: 12px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.row {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #9b5de5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #7b2cbf;
+}
+
+.login {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+.login a {
+    color: #9b5de5;
+    text-decoration: none;
+}
