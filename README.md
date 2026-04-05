@@ -38,9 +38,18 @@ cd myWebsite
 # Apply database migrations
 python manage.py migrate
 
-# Create your admin account
+# Create your admin account (Set Username and Password)
 python manage.py createsuperuser
 ```
+
+> [!TIP]
+> **Setting the Password**: 
+> When you run `createsuperuser`, follow the prompts:
+> 1. Type a **Username** (e.g., `user`) and hit Enter.
+> 2. Skip **Email** by hitting Enter.
+> 3. Type your **Password** (letters will not appear—this is normal!) and hit Enter.
+> 4. Type it again and hit Enter.
+> 5. If it says your password is "too common" or "too short", just type **`y`** to bypass and create it anyway!
 
 ## 5. Running the Server
 To start the development server, run:
