@@ -1,10 +1,24 @@
 {% extends 'website/layout.html' %}
 
-{% block title %}
-About
-{% endblock %}
+{% block title %}About Us{% endblock %}
 
 {% block content %}
-<h1>About Page</h1>
-<p>This is the about page.</p>
+<div class="container py-5 fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h1 class="display-4 fw-bold text-primary mb-4">About Store</h1>
+            <p class="lead text-muted mb-5">
+                We are passionate about delivering top-tier experiences and high-quality products directly to your doorstep.
+            </p>
+            <div class="card border-0 shadow-sm p-4">
+                <div class="card-body">
+                    <h3 class="h4 fw-bold text-dark mb-3">Our Mission</h3>
+                    <p class="text-secondary text-start mb-0">
+                        At Store, our mission is to redefine the way you shop online. Founded in 2026, we've curated an exclusive catalog of items that bring elegance and functionality into your everyday life.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

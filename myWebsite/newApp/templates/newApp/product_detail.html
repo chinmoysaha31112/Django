@@ -3,7 +3,7 @@
 {% block title %}{{ product.name }} - Product Details{% endblock %}
 
 {% block content %}
-<div class="product-detail-container">
+<div class="container py-5 fade-in product-detail-container">
     <nav class="breadcrumb">
         <a href="{% url 'newApp:home' %}">Products</a>
         <span class="separator">/</span>
@@ -203,9 +203,31 @@
                         <p class="review-comment">{{ review.comment }}</p>
                         <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
                     </div>
-                {% empty %}
-                    <p class="no-data">No reviews yet. Be the first to review this product!</p>
                 {% endfor %}
+
+                {% for feedback in product.feedbacks.all %}
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="user-info">
+                                <div class="user-avatar">{{ feedback.name|first|upper }}</div>
+                                <strong>{{ feedback.name }}</strong>
+                            </div>
+                            <div class="star-rating">
+                                {% for i in "12345"|make_list %}
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="{% if forloop.counter <= feedback.rating|default:5 %}#ffc107{% else %}#e4e5e9{% endif %}" stroke="none">
+                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                    </svg>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="review-comment">{{ feedback.message }}</p>
+                        <span class="review-date">{{ feedback.submitted_at|date:"M d, Y" }}</span>
+                    </div>
+                {% endfor %}
+
+                {% if not product.reviews.all and not product.feedbacks.all %}
+                    <p class="no-data">No reviews yet. Be the first to review this product!</p>
+                {% endif %}
             </div>
         </div>
 
