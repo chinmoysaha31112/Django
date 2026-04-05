@@ -269,6 +269,19 @@
                             <input type="email" id="fb-email" name="email" placeholder="e.g. john@example.com" required>
                         </div>
                     </div>
+                    <!-- ===== STAR RATING ===== -->
+                    <div class="form-group">
+                        <label>Your Rating</label>
+                        <div class="star-rating-input" id="starRatingInput">
+                            <input type="hidden" name="rating" id="ratingValue" value="5">
+                            <span class="star-input active" data-value="1" title="1 &#8211; Poor">&#9733;</span>
+                            <span class="star-input active" data-value="2" title="2 &#8211; Fair">&#9733;</span>
+                            <span class="star-input active" data-value="3" title="3 &#8211; Good">&#9733;</span>
+                            <span class="star-input active" data-value="4" title="4 &#8211; Very Good">&#9733;</span>
+                            <span class="star-input active" data-value="5" title="5 &#8211; Excellent">&#9733;</span>
+                        </div>
+                        <span class="rating-desc" id="ratingDesc">Excellent (5/5)</span>
+                    </div>
                     <div class="form-group">
                         <label for="fb-message">Your Message</label>
                         <textarea id="fb-message" name="message" rows="5" placeholder="Write your feedback, question, or suggestion here..." required></textarea>
@@ -405,6 +418,37 @@
         gap: 20px;
         color: #999;
         padding: 40px;
+    }
+
+    /* ===== STAR RATING INPUT ===== */
+    .star-rating-input {
+        display: flex;
+        gap: 6px;
+        margin-top: 4px;
+    }
+
+    .star-input {
+        font-size: 2rem;
+        color: #e4e5e9;
+        cursor: pointer;
+        transition: color 0.15s ease, transform 0.15s ease;
+        line-height: 1;
+        user-select: none;
+    }
+
+    .star-input.active {
+        color: #ffc107;
+    }
+
+    .star-input:hover {
+        transform: scale(1.2);
+    }
+
+    .rating-desc {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 4px;
+        display: block;
     }
 
     /* ===== FEEDBACK FORM ===== */
@@ -1144,6 +1188,50 @@
             const feedbackBtn = document.querySelector('[onclick*="feedback"]');
             if (feedbackBtn) { feedbackBtn.click(); }
         }
+
+        /* ===== STAR RATING WIDGET ===== */
+        const starLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+        const stars = document.querySelectorAll('.star-input');
+        const ratingInput = document.getElementById('ratingValue');
+        const ratingDesc = document.getElementById('ratingDesc');
+        let selectedRating = 5;
+
+        function highlightStars(upTo) {
+            stars.forEach(function(star) {
+                const val = parseInt(star.dataset.value);
+                if (val <= upTo) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        stars.forEach(function(star) {
+            star.addEventListener('mouseenter', function() {
+                const val = parseInt(this.dataset.value);
+                highlightStars(val);
+                if (ratingDesc) {
+                    ratingDesc.textContent = starLabels[val] + ' (' + val + '/5)';
+                }
+            });
+
+            star.addEventListener('mouseleave', function() {
+                highlightStars(selectedRating);
+                if (ratingDesc) {
+                    ratingDesc.textContent = starLabels[selectedRating] + ' (' + selectedRating + '/5)';
+                }
+            });
+
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.value);
+                if (ratingInput) { ratingInput.value = selectedRating; }
+                highlightStars(selectedRating);
+                if (ratingDesc) {
+                    ratingDesc.textContent = starLabels[selectedRating] + ' (' + selectedRating + '/5)';
+                }
+            });
+        });
     });
 </script>
 {% endblock %}

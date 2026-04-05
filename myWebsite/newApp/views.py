@@ -33,11 +33,18 @@ def submit_feedback(request, product_id):
         name = request.POST.get('name', '').strip()
         email = request.POST.get('email', '').strip()
         message = request.POST.get('message', '').strip()
+        try:
+            rating = int(request.POST.get('rating', 5))
+            if not (1 <= rating <= 5):
+                rating = 5
+        except (ValueError, TypeError):
+            rating = 5
         if name and email and message:
             ProductFeedback.objects.create(
                 product=product,
                 name=name,
                 email=email,
+                rating=rating,
                 message=message,
             )
             messages.success(request, 'Thank you! Your feedback has been submitted.')

@@ -35,5 +35,5 @@ class ProductCertificateAdmin(admin.ModelAdmin):
 
 @admin.register(ProductFeedback)
 class ProductFeedbackAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'product', 'submitted_at')
+    list_display = ('name', 'email', 'product', 'rating', 'submitted_at')
     readonly_fields = ('submitted_at',)

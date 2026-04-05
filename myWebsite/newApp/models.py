@@ -66,8 +66,9 @@ class ProductFeedback(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='feedbacks')
     name = models.CharField(max_length=100)
     email = models.EmailField()
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], default=5)
     message = models.TextField()
     submitted_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Feedback from {self.name} on {self.product.name}"
+        return f"Feedback from {self.name} on {self.product.name} - Rating: {self.rating}"
