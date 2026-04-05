@@ -40,7 +40,7 @@ class Store(models.Model):
     def __str__(self):
         return self.name
 
-#one to one relationship
+# One to one relationship
 class ProductCertificate(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE)
     certificate_number = models.CharField(max_length=100)
@@ -51,4 +51,23 @@ class ProductCertificate(models.Model):
         return f"Certificate for {self.product.name}"
 
 
+# Gallery images for a product (supports multiple images)
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='products/gallery/')
+    alt_text = models.CharField(max_length=100, blank=True)
 
+    def __str__(self):
+        return f"Image for {self.product.name}"
+
+
+# Feedback / contact submission for a product
+class ProductFeedback(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='feedbacks')
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    submitted_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Feedback from {self.name} on {self.product.name}"
