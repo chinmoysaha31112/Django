@@ -1,0 +1,197 @@
+{% extends 'website/layout.html' %}
+
+{% block title %}Checkout — Delivery Details{% endblock %}
+
+{% block content %}
+<div class="container py-5 fade-in">
+    <div class="d-flex align-items-center mb-4 gap-3">
+        <h1 class="display-6 fw-bold text-dark mb-0">
+            <i class="bi bi-truck text-primary me-2"></i>Checkout
+        </h1>
+    </div>
+
+    {% if messages %}
+        {% for msg in messages %}
+        <div class="alert alert-{% if msg.tags == 'error' %}danger{% else %}{{ msg.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Delivery Form -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold text-dark mb-4">
+                    <i class="bi bi-geo-alt text-primary me-2"></i>Delivery Details
+                </h4>
+
+                <form method="POST" action="{% url 'newApp:checkout' %}" id="checkoutForm">
+                    {% csrf_token %}
+
+                    <!-- Full Name & Phone -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="full_name" class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg rounded-3" id="full_name" name="full_name"
+                                   placeholder="e.g. Rahul Sharma" value="{{ form_data.full_name|default:'' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control form-control-lg rounded-3" id="phone" name="phone"
+                                   placeholder="e.g. 9876543210" value="{{ form_data.phone|default:'' }}"
+                                   pattern="[0-9]{10,15}" required>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control form-control-lg rounded-3" id="email" name="email"
+                               placeholder="e.g. rahul@example.com" value="{{ form_data.email|default:'' }}" required>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="mb-3">
+                        <label for="address_line1" class="form-label fw-semibold">Address Line 1 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-lg rounded-3" id="address_line1" name="address_line1"
+                               placeholder="House / Flat No., Street Name" value="{{ form_data.address_line1|default:'' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address_line2" class="form-label fw-semibold">Address Line 2 <span class="text-muted small">(optional)</span></label>
+                        <input type="text" class="form-control form-control-lg rounded-3" id="address_line2" name="address_line2"
+                               placeholder="Landmark, Area, Colony" value="{{ form_data.address_line2|default:'' }}">
+                    </div>
+
+                    <!-- City / State / Pincode -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="city" class="form-label fw-semibold">City <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg rounded-3" id="city" name="city"
+                                   placeholder="e.g. Mumbai" value="{{ form_data.city|default:'' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="state" class="form-label fw-semibold">State <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg rounded-3" id="state" name="state"
+                                   placeholder="e.g. Maharashtra" value="{{ form_data.state|default:'' }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="pincode" class="form-label fw-semibold">Pincode <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg rounded-3" id="pincode" name="pincode"
+                                   placeholder="e.g. 400001" value="{{ form_data.pincode|default:'' }}"
+                                   pattern="[0-9]{6}" maxlength="6" required>
+                        </div>
+                    </div>
+
+                    <!-- Trust badges -->
+                    <div class="d-flex gap-3 flex-wrap mb-4">
+                        <div class="trust-badge">
+                            <i class="bi bi-shield-check text-success me-1"></i>
+                            <span>Secure Order</span>
+                        </div>
+                        <div class="trust-badge">
+                            <i class="bi bi-truck text-primary me-1"></i>
+                            <span>Free Delivery</span>
+                        </div>
+                        <div class="trust-badge">
+                            <i class="bi bi-arrow-counterclockwise text-warning me-1"></i>
+                            <span>Easy Returns</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 fs-5" id="placeOrderBtn">
+                        <i class="bi bi-bag-check-fill me-2"></i>Place Order
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Order Summary Sidebar -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 20px;">
+                <h4 class="fw-bold text-dark mb-4">
+                    <i class="bi bi-receipt text-primary me-2"></i>Order Summary
+                </h4>
+
+                <div class="order-items mb-3">
+                    {% for item in cart_items %}
+                    <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                        <div class="flex-shrink-0">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
+                                     class="rounded-3" style="width:60px;height:60px;object-fit:contain;background:#f8f9fa;">
+                            {% else %}
+                                <div class="rounded-3 bg-light d-flex align-items-center justify-content-center"
+                                     style="width:60px;height:60px;">
+                                    <i class="bi bi-image text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold text-dark small">{{ item.product.name }}</div>
+                            <div class="text-muted small">Qty: {{ item.quantity }}</div>
+                        </div>
+                        <div class="fw-bold text-primary">&#8377;{{ item.subtotal }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Subtotal</span>
+                    <span class="fw-semibold">&#8377;{{ grand_total }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Delivery Charges</span>
+                    <span class="text-success fw-semibold">FREE</span>
+                </div>
+
+                <hr class="my-3">
+
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="fw-bold fs-5">Total Payable</span>
+                    <span class="fw-bold fs-5 text-primary">&#8377;{{ grand_total }}</span>
+                </div>
+                <small class="text-muted">Inclusive of all taxes</small>
+
+                <a href="{% url 'newApp:view_cart' %}" class="btn btn-outline-secondary w-100 mt-3 rounded-3">
+                    <i class="bi bi-arrow-left me-2"></i>Edit Cart
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.trust-badge {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #444;
+    border: 1px solid #e9ecef;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+#placeOrderBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+    transition: all 0.2s ease;
+}
+</style>
+
+<script>
+document.getElementById('checkoutForm').addEventListener('submit', function() {
+    const btn = document.getElementById('placeOrderBtn');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Placing Order...';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}

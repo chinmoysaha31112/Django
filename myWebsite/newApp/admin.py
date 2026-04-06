@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, ProductReview, Store, ProductCertificate, ProductImage, ProductFeedback
+from .models import Product, ProductReview, Store, ProductCertificate, ProductImage, ProductFeedback, Order, OrderItem
 
 
 class ProductImageInline(admin.TabularInline):
@@ -37,3 +37,23 @@ class ProductCertificateAdmin(admin.ModelAdmin):
 class ProductFeedbackAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'product', 'rating', 'submitted_at')
     readonly_fields = ('submitted_at',)
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ('product_name', 'price', 'quantity')
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'full_name', 'phone', 'city', 'total_amount', 'status', 'created_at')
+    list_filter = ('status',)
+    search_fields = ('full_name', 'email', 'phone')
+    readonly_fields = ('created_at',)
+    inlines = [OrderItemInline]
+
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('order', 'product_name', 'quantity', 'price')

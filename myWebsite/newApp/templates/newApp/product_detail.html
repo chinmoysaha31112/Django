@@ -85,7 +85,10 @@
 
             <div class="product-description">
                 <h3>Description</h3>
-                <p>{{ product.description|default:"No description available for this product." }}</p>
+                <div id="descText" class="desc-collapsed">
+                    <p>{{ product.description|default:"No description available for this product." }}</p>
+                </div>
+                <button class="btn-more" id="descToggle" onclick="toggleDescription()">More ▼</button>
             </div>
 
             <div class="product-details-grid">
@@ -104,28 +107,31 @@
             </div>
 
             <div class="product-actions">
-                <div class="quantity-selector">
-                    <label for="quantity">Quantity:</label>
-                    <div class="quantity-controls">
-                        <button type="button" onclick="decreaseQuantity()">-</button>
-                        <input type="number" id="quantity" value="1" min="1" max="10">
-                        <button type="button" onclick="increaseQuantity()">+</button>
+                <form method="POST" action="{% url 'newApp:add_to_cart' product.id %}" id="cartForm">
+                    {% csrf_token %}
+                    <div class="quantity-selector">
+                        <label for="quantity">Quantity:</label>
+                        <div class="quantity-controls">
+                            <button type="button" onclick="decreaseQuantity()">-</button>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="10">
+                            <button type="button" onclick="increaseQuantity()">+</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="action-buttons">
-                    <button class="btn btn-primary btn-large" onclick="addToCart()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <circle cx="9" cy="21" r="1"></circle>
-                            <circle cx="20" cy="21" r="1"></circle>
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                        </svg>
-                        Add to Cart
-                    </button>
-                    <button class="btn btn-secondary btn-large" onclick="buyNow()">
-                        Buy Now
-                    </button>
-                </div>
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary btn-large">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                            Add to Cart
+                        </button>
+                        <button type="submit" name="buy_now" value="1" class="btn btn-secondary btn-large">
+                            Buy Now
+                        </button>
+                    </div>
+                </form>
             </div>
 
             <div class="product-features">
@@ -754,6 +760,36 @@
         padding: 20px;
     }
 
+    /* ===== DESCRIPTION MORE/LESS ===== */
+    .desc-collapsed {
+        max-height: 4.8em;   /* ~3 lines */
+        overflow: hidden;
+        position: relative;
+        transition: max-height 0.4s ease;
+    }
+
+    .desc-expanded {
+        max-height: 1000px;
+        overflow: visible;
+        transition: max-height 0.5s ease;
+    }
+
+    .btn-more {
+        background: none;
+        border: none;
+        color: #007bff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 4px 0;
+        margin-top: 4px;
+        display: inline-block;
+    }
+
+    .btn-more:hover {
+        text-decoration: underline;
+    }
+
     .breadcrumb {
         display: flex;
         align-items: center;
@@ -1084,26 +1120,31 @@
     /* ===== QUANTITY CONTROLS ===== */
     function increaseQuantity() {
         const input = document.getElementById('quantity');
-        if (input.value < 10) {
+        if (parseInt(input.value) < 10) {
             input.value = parseInt(input.value) + 1;
         }
     }
 
     function decreaseQuantity() {
         const input = document.getElementById('quantity');
-        if (input.value > 1) {
+        if (parseInt(input.value) > 1) {
             input.value = parseInt(input.value) - 1;
         }
     }
 
-    function addToCart() {
-        const quantity = document.getElementById('quantity').value;
-        alert(`Added ${quantity} item(s) to cart!`);
-    }
-
-    function buyNow() {
-        const quantity = document.getElementById('quantity').value;
-        alert(`Proceeding to checkout with ${quantity} item(s)!`);
+    /* ===== DESCRIPTION TOGGLE ===== */
+    function toggleDescription() {
+        const desc = document.getElementById('descText');
+        const btn  = document.getElementById('descToggle');
+        if (desc.classList.contains('desc-collapsed')) {
+            desc.classList.remove('desc-collapsed');
+            desc.classList.add('desc-expanded');
+            btn.textContent = 'Less \u25b2';
+        } else {
+            desc.classList.remove('desc-expanded');
+            desc.classList.add('desc-collapsed');
+            btn.textContent = 'More \u25bc';
+        }
     }
 
     /* ===== TAB SWITCHING ===== */

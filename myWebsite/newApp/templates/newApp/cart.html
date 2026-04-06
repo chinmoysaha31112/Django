@@ -1,0 +1,174 @@
+{% extends 'website/layout.html' %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<div class="container py-5 fade-in">
+
+    <div class="d-flex align-items-center mb-4 gap-3">
+        <h1 class="display-6 fw-bold text-dark mb-0">
+            <i class="bi bi-cart3 text-primary me-2"></i>Your Cart
+        </h1>
+        {% if cart_items %}
+            <span class="badge bg-primary rounded-pill fs-6">{{ cart_items|length }} item{{ cart_items|length|pluralize }}</span>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        {% for msg in messages %}
+        <div class="alert alert-{% if msg.tags == 'error' %}danger{% else %}{{ msg.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if cart_items %}
+    <div class="row g-4">
+        <!-- Cart Items -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-0">
+                    {% for item in cart_items %}
+                    <div class="cart-item d-flex align-items-center gap-3 p-4 {% if not forloop.last %}border-bottom{% endif %}">
+                        <!-- Product Image -->
+                        <div class="cart-img-wrap flex-shrink-0">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="cart-img">
+                            {% else %}
+                                <div class="cart-img-placeholder d-flex align-items-center justify-content-center bg-light rounded-3">
+                                    <i class="bi bi-image text-muted" style="font-size:2rem;"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Product Info -->
+                        <div class="flex-grow-1">
+                            <h5 class="fw-bold text-dark mb-1">
+                                <a href="{% url 'newApp:product_detail' item.product.id %}" class="text-dark text-decoration-none hover-primary">
+                                    {{ item.product.name }}
+                                </a>
+                            </h5>
+                            <p class="text-muted small mb-2">{{ item.product.description|truncatewords:10 }}</p>
+                            <span class="fs-5 fw-bold text-primary">&#8377;{{ item.product.price }}</span>
+                        </div>
+
+                        <!-- Quantity Updater -->
+                        <form method="POST" action="{% url 'newApp:update_cart' item.product.id %}" class="d-flex align-items-center gap-2 quantity-form">
+                            {% csrf_token %}
+                            <div class="qty-control d-flex align-items-center border rounded-3 overflow-hidden">
+                                <button type="button" class="qty-btn border-0 bg-light px-3 py-2 fw-bold"
+                                        onclick="changeQty(this, -1)">−</button>
+                                <input type="number" name="quantity" value="{{ item.quantity }}"
+                                       min="1" max="10" class="qty-input border-0 text-center fw-semibold"
+                                       style="width:50px;"
+                                       onchange="this.closest('form').submit()">
+                                <button type="button" class="qty-btn border-0 bg-light px-3 py-2 fw-bold"
+                                        onclick="changeQty(this, 1)">+</button>
+                            </div>
+                        </form>
+
+                        <!-- Subtotal -->
+                        <div class="text-end" style="min-width:100px;">
+                            <div class="fw-bold fs-5 text-dark">&#8377;{{ item.subtotal }}</div>
+                            <small class="text-muted">{{ item.quantity }} × &#8377;{{ item.product.price }}</small>
+                        </div>
+
+                        <!-- Remove -->
+                        <form method="POST" action="{% url 'newApp:remove_from_cart' item.product.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-3" title="Remove">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <a href="{% url 'newApp:home' %}" class="btn btn-outline-secondary mt-4">
+                <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+            </a>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 20px;">
+                <h4 class="fw-bold text-dark mb-4">
+                    <i class="bi bi-receipt text-primary me-2"></i>Order Summary
+                </h4>
+
+                {% for item in cart_items %}
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span class="text-muted">{{ item.product.name|truncatewords:4 }} × {{ item.quantity }}</span>
+                    <span class="fw-semibold">&#8377;{{ item.subtotal }}</span>
+                </div>
+                {% endfor %}
+
+                <hr class="my-3">
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Subtotal</span>
+                    <span class="fw-semibold">&#8377;{{ grand_total }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Shipping</span>
+                    <span class="text-success fw-semibold">FREE</span>
+                </div>
+
+                <hr class="my-3">
+
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="fw-bold fs-5">Total</span>
+                    <span class="fw-bold fs-5 text-primary">&#8377;{{ grand_total }}</span>
+                </div>
+
+                <a href="{% url 'newApp:checkout' %}" class="btn btn-primary w-100 py-3 fw-bold rounded-3 fs-6">
+                    <i class="bi bi-bag-check me-2"></i>Proceed to Checkout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Empty Cart -->
+    <div class="text-center py-5 my-3">
+        <i class="bi bi-cart-x display-1 text-muted mb-4 d-block"></i>
+        <h2 class="fw-bold text-dark mb-2">Your cart is empty</h2>
+        <p class="text-muted mb-4">Looks like you haven't added anything yet!</p>
+        <a href="{% url 'newApp:home' %}" class="btn btn-primary px-5 py-3 rounded-3 fw-bold">
+            <i class="bi bi-shop me-2"></i>Browse Products
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.cart-img-wrap { width: 90px; height: 90px; }
+.cart-img { width: 90px; height: 90px; object-fit: contain; border-radius: 12px; background: #f8f9fa; padding: 4px; }
+.cart-img-placeholder { width: 90px; height: 90px; border-radius: 12px; }
+
+.qty-btn { cursor: pointer; transition: background 0.2s; }
+.qty-btn:hover { background-color: #e9ecef !important; }
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.qty-input { -moz-appearance: textfield; }
+
+.hover-primary:hover { color: #007bff !important; }
+
+.cart-item { transition: background 0.2s ease; }
+.cart-item:hover { background: #f8f9ff; }
+</style>
+
+<script>
+function changeQty(btn, delta) {
+    const form = btn.closest('.quantity-form');
+    const input = form.querySelector('input[name="quantity"]');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > 10) val = 10;
+    input.value = val;
+    form.submit();
+}
+</script>
+{% endblock %}
